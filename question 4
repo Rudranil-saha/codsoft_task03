@@ -1,0 +1,126 @@
+class Student {
+    constructor(id, name, age, grade) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.grade = grade;
+    }
+}
+
+class StudentManagementSystem {
+    constructor() {
+        this.students = JSON.parse(localStorage.getItem('students')) || [];
+        this.nextId = localStorage.getItem('nextId') || 1;
+    }
+
+    addStudent(student) {
+        student.id = this.nextId++;
+        this.students.push(student);
+        this.saveStudents();
+    }
+
+    editStudent(id, newData) {
+        const index = this.students.findIndex(student => student.id === id);
+        if (index !== -1) {
+            this.students[index] = { ...this.students[index], ...newData };
+            this.saveStudents();
+        } else {
+            console.log("Student not found.");
+        }
+    }
+
+    searchStudent(name) {
+        return this.students.filter(student => student.name.toLowerCase().includes(name.toLowerCase()));
+    }
+
+    displayAllStudents() {
+        this.students.forEach(student => console.log(student));
+    }
+
+    saveStudents() {
+        localStorage.setItem('students', JSON.stringify(this.students));
+        localStorage.setItem('nextId', this.nextId);
+    }
+}
+
+const sms = new StudentManagementSystem();
+
+function addStudent() {
+    const name = prompt("Enter student name:");
+    const age = parseInt(prompt("Enter student age:"));
+    const grade = parseFloat(prompt("Enter student grade:"));
+    if (validateInput(name, age, grade)) {
+        sms.addStudent(new Student(null, name, age, grade));
+        console.log("Student added successfully.");
+    } else {
+        console.log("Invalid input. Please try again.");
+    }
+}
+
+function editStudent() {
+    const id = parseInt(prompt("Enter student ID to edit:"));
+    const name = prompt("Enter updated student name:");
+    const age = parseInt(prompt("Enter updated student age:"));
+    const grade = parseFloat(prompt("Enter updated student grade:"));
+    if (validateInput(name, age, grade)) {
+        sms.editStudent(id, { name, age, grade });
+        console.log("Student information updated successfully.");
+    } else {
+        console.log("Invalid input. Please try again.");
+    }
+}
+
+function searchStudent() {
+    const name = prompt("Enter student name to search:");
+    const results = sms.searchStudent(name);
+    if (results.length > 0) {
+        console.log("Search results:");
+        results.forEach(student => console.log(student));
+    } else {
+        console.log("No student found with that name.");
+    }
+}
+
+function displayAllStudents() {
+    console.log("All students:");
+    sms.displayAllStudents();
+}
+
+function validateInput(name, age, grade) {
+    return name && age && !isNaN(age) && grade && !isNaN(grade);
+}
+
+function main() {
+    let choice;
+    do {
+        console.log("\nStudent Management System");
+        console.log("1. Add New Student");
+        console.log("2. Edit Student Information");
+        console.log("3. Search Student");
+        console.log("4. Display All Students");
+        console.log("5. Exit");
+
+        choice = parseInt(prompt("Enter your choice:"));
+        switch (choice) {
+            case 1:
+                addStudent();
+                break;
+            case 2:
+                editStudent();
+                break;
+            case 3:
+                searchStudent();
+                break;
+            case 4:
+                displayAllStudents();
+                break;
+            case 5:
+                console.log("Exiting the application.");
+                break;
+            default:
+                console.log("Invalid choice. Please try again.");
+        }
+    } while (choice !== 5);
+}
+
+main();
